@@ -1,0 +1,30 @@
+<!-- ./templates/manage_discussions.html -->
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Discussions</h2>
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th>Topic</th>
+                <th>Content</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for discussion in discussions %}
+            <tr>
+                <td>{{ discussion.topic }}</td>
+                <td>{{ discussion.content }}</td>
+                <td>
+                    <a class="btn btn-primary btn-sm" href="{{ url_for('admin_edit_discussion', discussion_id=discussion._id) }}">Edit</a>
+                    <a class="btn btn-danger btn-sm" href="{{ url_for('admin_delete_discussion', discussion_id=discussion._id) }}" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+<!-- ./templates/profile.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>My Profile</h2>
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Name:</strong> {{ alumni.name }}</p>
+            <p><strong>Graduation Year:</strong> {{ alumni.graduation_year }}</p>
+            <p><strong>Industry:</strong> {{ alumni.industry }}</p>
+            <p><strong>Contact Details:</strong> {{ alumni.contact_details }}</p>
+            <a tabindex="0" href="{{ url_for('edit_profile') }}" class="btn btn-primary mt-3">Edit Profile</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,14 @@
+<!-- ./templates/view_event.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <img src="event_image.jpg" class="img-fluid" alt="Description of the event image">
+    <h2 class="mt-4">{{ event.title }}</h2>
+    <p><strong>Date:</strong> {{ event.date }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p>{{ event.description }}</p>
+    <a tabindex="0" href="{{ url_for('edit_event', event_id=event._id) }}" class="btn btn-warning">Edit Event</a>
+    <a tabindex="0" href="{{ url_for('rsvp_event', event_id=event._id) }}" class="btn btn-primary">RSVP</a>
+</div>
+{% endblock %}

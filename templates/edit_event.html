@@ -1,0 +1,27 @@
+<!-- ./templates/edit_event.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Edit Event</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label" for="title">Title:</label>
+            <input class="form-control" tabindex="0" type="text" id="title" name="title" value="{{ event.title }}" placeholder="Enter Title" required><br>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="date">Date:</label>
+            <input class="form-control" tabindex="0" type="date" id="date" name="date" value="{{ event.date }}" placeholder="Enter Date" required><br>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="location">Location:</label>
+            <input class="form-control" tabindex="0" type="text" id="location" name="location" value="{{ event.location }}" placeholder="Enter Location" required><br>   
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="description">Description:</label>
+            <textarea class="form-control" tabindex="0" id="description" name="description" placeholder="Enter Description" required>{{ event.description }}</textarea><br>
+        </div>
+        <button class="btn btn-primary" tabindex="0" type="submit">Update Event</button>
+    </form>
+</div>
+{% endblock %}

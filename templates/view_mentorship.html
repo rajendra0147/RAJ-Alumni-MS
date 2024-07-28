@@ -1,0 +1,19 @@
+<!-- ./templates/view_mentorship.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Mentorship Details</h2>
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Mentor Name:</strong> {{ mentorship.mentor_name }}</p>
+            <p><strong>Mentee Name:</strong> {{ mentorship.mentee_name }}</p>
+            <p><strong>Details:</strong> {{ mentorship.details }}</p>
+            <p><strong>Contact Info:</strong> {{ mentorship.contact_info }}</p>
+            {% if mentorship.mentor_name == current_user.username %}
+            <a tabindex="0" href="{{ url_for('edit_mentorship', mentorship_id=mentorship._id) }}">Edit Mentorship</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

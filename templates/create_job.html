@@ -1,0 +1,29 @@
+<!-- ./templates/create_job.html -->
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Post a New Job</h2>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label" for="title">Title:</label>
+            <input class="form-control" tabindex="0" type="text" id="title" name="title" placeholder="Enter Title" required><br>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="description">Description:</label>
+            <textarea class="form-control" tabindex="0" id="description" name="description" placeholder="Enter Description" required></textarea><br>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="company">Company:</label>
+            <input class="form-control" tabindex="0" type="text" id="company" name="company" placeholder="Enter Company Name" required><br>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="location">Location:</label>
+            <input class="form-control" tabindex="0" type="text" id="location" name="location" placeholder="Enter Location" required><br>
+        </div>
+        <button class="btn btn-primary" tabindex="0" type="submit">Post Job</button>
+    </form>
+</div>
+{% endblock %}
+

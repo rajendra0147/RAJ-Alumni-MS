@@ -1,0 +1,352 @@
+
+/* ./static/css/styles.css  */
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #F8F9FA;
+    color: #343A40;
+    padding-bottom: 4em;
+    transition: background-color 0.3s;
+    height:100%;
+    display:flex;
+    flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    color: #343A40;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 1em;
+}
+
+section {
+    margin: 2em 0;
+}
+
+/* Header and Navigation */
+
+header {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #333;
+}
+
+header nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #343A40;
+    padding: 1em;
+    transition: background-color 0.3s;
+}
+
+header nav a {
+    color: #F8F9FA;
+    text-decoration: none;
+    margin: 0 0.5em;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s, text-decoration 0.3s;
+}
+
+header nav a:hover {
+    text-decoration: underline;
+}
+
+header nav .icon {
+    width: 20px;
+    height: 20px;
+    fill: #F8F9FA;
+    margin-right: 0.5em;
+}
+
+nav {
+    background-color: #6C757D;
+    padding: 1rem;
+    transition: background-color 0.3s;
+}
+
+nav a {
+    color: #ffffff;
+    text-decoration: none;
+    margin-right: 1rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.3s, transform 0.3s;
+}
+
+nav a:hover {
+    color: #adb5bd;
+    transform: scale(1.1);
+}
+
+nav .icon {
+    width: 20px;
+    height: 20px;
+    fill: #FFFFFF;
+    margin-right: 0.5em;
+}
+
+
+.main-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-nav .menu {
+    display: flex;
+    gap: 1rem;
+}
+
+
+.main-nav .menu-icon {
+    display: none;
+    cursor: pointer;
+}
+
+
+
+.main-nav .menu-icon i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+
+
+.breadcrumbs {
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.breadcrumbs a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.breadcrumbs a:hover {
+    text-decoration: underline;
+}
+
+/* Main Content */
+main {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex:1;
+}
+
+
+
+form {
+    max-width: 600px;
+    margin: 2em 0;
+    padding: 2em;
+    /* margin: 0 auto;
+    padding: 1em; */
+    background: #FFFFFF;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+label {
+    margin-top: 1em;
+    display: block;
+    opacity: 0;
+    animation: slideInUp 0.5s forwards;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 0.5em;
+    margin-top: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+input:focus, textarea:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.25);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Buttons */
+button {
+    background-color: #007BFF;
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    margin-top: 1em;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Footer */
+footer {
+    background-color: #343A40;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 1em 0;
+    /* position: fixed; */
+    width: 100%;
+    /* bottom: 0; */
+    transition: background-color 0.3s;
+}
+
+.flashes {
+    list-style: none;
+    padding: 0;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+.flash {
+    padding: 1em;
+    margin: 1em 0;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.flash.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.flash.danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+
+
+/* Responsive Design */
+
+
+
+/* Mobile Styles (default) */
+header nav {
+    flex-direction: column;
+    align-items: center;
+}
+
+header nav a {
+    display: block;
+    margin: 0.5em 0;
+}
+
+/* Tablet Styles */
+@media (max-width: 768px) {
+    header nav {
+        /* flex-direction: row; */
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .main-nav .menu {
+        display: none;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .main-nav .menu-icon {
+        display: block;
+    }
+
+    .main-nav.active .menu {
+        display: flex;
+    }
+
+
+    header nav a {
+        margin: 0 1em;
+    }
+    
+    nav a {
+        margin: 0.5rem 0;
+    }
+    
+
+
+
+    main {
+        padding: 3rem;
+    }
+
+    form {
+        max-width: 700px;
+    }
+}
+
+/* Desktop Styles */
+@media (min-width: 1024px) {
+    header nav {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    header nav a {
+        margin: 0 1.5em;
+    }
+
+    main {
+        padding: 4rem;
+    }
+
+    form {
+        max-width: 800px;
+    }
+
+    footer {
+        padding: 1.5em 0;
+    }
+
+
+} 

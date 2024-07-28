@@ -1,0 +1,30 @@
+<!-- ./templates/discussions.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Discussions</h2>
+        <a class="btn btn-primary" tabindex="0" href="{{ url_for('create_discussion') }}">Create New Discussion</a>
+    </div>
+
+    <div class="mb-4">
+        <h3>Categories</h3>
+        <ul class="list-group">
+            {% for category in categories %}
+            <li class="list-group-item">{{ category[0] }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <ul class="list-group">
+        {% for discussion in discussions %}
+        <li class="list-group-item mb-3">
+            <h4><a tabindex="0" href="{{ url_for('view_discussion', discussion_id=discussion._id) }}">{{ discussion.topic }}</a></h4>
+            <p><strong>Category:</strong> {{ discussion.category }}</p>
+            <p><strong>Author:</strong> {{ discussion.author }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

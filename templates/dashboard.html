@@ -1,0 +1,92 @@
+<!-- ./templates/dashboard.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Dashboard</h1>
+
+    <section class="mb-5">
+        <h2>Profile</h2>
+        <div class="card p-3">
+            {% if alumni %}
+                <p><strong>Name:</strong> {{ alumni.name }}</p>
+                <p><strong>Graduation Year:</strong> {{ alumni.graduation_year }}</p>
+                <p><strong>Industry:</strong> {{ alumni.industry }}</p>
+                <p><strong>Contact Details:</strong> {{ alumni.contact_details }}</p>
+                <a tabindex="0" href="{{ url_for('edit_profile', alumni_id=alumni.id) }}" class="btn btn-primary">Edit Profile</a>
+            {% else %}
+                <p>You have not created a profile yet.</p>
+                <a tabindex="0" href="{{ url_for('create_profile') }}" class="btn btn-primary">Create Profile</a>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="mb-5">
+        <h2>Upcoming Events</h2>
+        {% if upcoming_events %}
+            <ul class="list-group">
+                {% for event in upcoming_events %}
+                    <li class="list-group-item">
+                        <h3>{{ event.title }}</h3>
+                        <p>{{ event.date.strftime('%B %d, %Y') }} at {{ event.location }}</p>
+                        <p>{{ event.description }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No upcoming events.</p>
+        {% endif %}
+    </section>
+
+    <section class="mb-5">
+        <h2>Recent Discussions</h2>
+        {% if recent_discussions %}
+            <ul class="list-group">
+                {% for discussion in recent_discussions %}
+                    <li class="list-group-item">
+                        <h3>{{ discussion.topic }}</h3>
+                        <p>{{ discussion.content }}</p>
+                        <a tabindex="0" href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" class="btn btn-primary">View Discussion</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No recent discussions.</p>
+        {% endif %}
+    </section>
+
+    <section class="mb-5">
+        <h2>Your Job Postings</h2>
+        {% if user_jobs %}
+            <ul class="list-group">
+                {% for job in user_jobs %}
+                    <li class="list-group-item">
+                        <h3>{{ job.title }}</h3>
+                        <p>{{ job.company }} - {{ job.location }}</p>
+                        <p>{{ job.description }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No job postings created by you.</p>
+        {% endif %}
+    </section>
+
+    <section class="mb-5">
+        <h2>Mentorship Opportunities</h2>
+        {% if user_mentorships %}
+            <ul class="list-group">
+                {% for mentorship in user_mentorships %}
+                    <li class="list-group-item">
+                        <h3>{{ mentorship.mentor_name }} mentoring {{ mentorship.mentee_name }}</h3>
+                        <p>{{ mentorship.details }}</p>
+                        <p><strong>Contact:</strong> {{ mentorship.contact_info }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No mentorship opportunities.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

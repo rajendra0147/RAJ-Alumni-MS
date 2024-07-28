@@ -1,0 +1,32 @@
+<!-- ./templates/discussion.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">{{ discussion.topic }}</h2>
+    <div class="card mb-4 p-3">
+        <p>{{ discussion.content }}</p>
+        <p><strong>Category:</strong> {{ discussion.category }}</p>
+        <p><strong>Author:</strong> {{ discussion.author }}</p>
+    </div>
+
+    <h3>Replies</h3>
+    <ul class="list-group mb-4">
+        {% for reply in replies %}
+        <li class="list-group-item">
+            <p>{{ reply.content }}</p>
+            <p><strong>Author:</strong> {{ reply.author }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <h3>Post a Reply</h3>
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label" for="content">Reply:</label>
+            <textarea class="form-control" tabindex="0" id="content" name="content" placeholder="Enter Content" required></textarea>
+        </div>
+        <button class="btn btn-primary" tabindex="0" type="submit">Post Reply</button>
+    </form>
+</div>
+{% endblock %}

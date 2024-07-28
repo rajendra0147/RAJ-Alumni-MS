@@ -1,0 +1,25 @@
+<!-- ./templates/mentorships.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Mentorship Opportunities</h2>
+    <a tabindex="0" class="btn btn-primary mb-3" href="{{ url_for('create_mentorship') }}">Post a New Mentorship</a>
+    <div>
+        <h3>New Mentorship</h3>
+        <ul class="list-group mb-3">
+            {% for category in categories %}
+            <li class="list-group-item">{{ category[0] }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <ul class="list-group">
+        {% for mentorship in mentorships %}
+        <li class="list-group-item">
+            <a tabindex="0" href="{{ url_for('view_mentorship', mentorship_id=mentorship._id) }}">{{ mentorship.mentor_name }} mentors {{ mentorship.mentee_name }}</a>
+            <p>Contact Info: {{ mentorship.contact_info }}</p>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

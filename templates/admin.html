@@ -1,0 +1,67 @@
+<!-- ./templates/admin.html -->
+<!-- ./templates/admin.html -->
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Admin Dashboard</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">User Management</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="{{ url_for('admin_create_user') }}">Create User</a></li>
+                        <li class="list-group-item"><a href="{{ url_for('admin_manage_users') }}">Manage Users</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Event Management</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="{{ url_for('admin_create_event') }}">Create Event</a></li>
+                        <li class="list-group-item"><a href="{{ url_for('admin_manage_events') }}">Manage Events</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Job Management</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="{{ url_for('admin_create_job') }}">Post Job</a></li>
+                        <li class="list-group-item"><a href="{{ url_for('admin_manage_jobs') }}">Manage Jobs</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">Discussion Management</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="{{ url_for('admin_create_discussion') }}">Create Discussion</a></li>
+                        <li class="list-group-item"><a href="{{ url_for('admin_manage_discussions') }}">Manage Discussions</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">System Monitoring</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="{{ url_for('admin_view_logs') }}">View Logs</a></li>
+                        <li class="list-group-item"><a href="{{ url_for('admin_generate_reports') }}">Generate Reports</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
