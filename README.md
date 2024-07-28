@@ -72,13 +72,13 @@ Welcome to the Alumni Management System ! This web application is designed to ma
 
 ## Dependencies
 
-- Flask==2.1.2
-- Flask-Login==0.5.0
-- Flask-Mail==0.9.1
-- Flask-PyMongo==2.3.0
-- Flask-Uploads==0.2.1
-- pymongo==4.0.1
-- Werkzeug==2.1.2
+> - Flask==2.1.2
+> - Flask-Login==0.5.0
+> - Flask-Mail==0.9.1
+> - Flask-PyMongo==2.3.0
+> - Flask-Uploads==0.2.1
+> - pymongo==4.0.1
+> - Werkzeug==2.1.2
 
 ## Contributing
 
