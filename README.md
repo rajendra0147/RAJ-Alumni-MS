@@ -85,7 +85,7 @@ Welcome to the Alumni Management System ! This web application is designed to ma
 Contributions are welcome! Please fork the repository and create a pull request with your changes. Make sure to follow the project's coding standards and write clear commit messages.
 
 > 1. Fork the Project
-> 2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
-> 3. Commit your Changes (git commit -m 'Add some AmazingFeature')
-> 4. Push to the Branch (git push origin feature/AmazingFeature)
+> 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+> 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+> 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 > 5. Open a Pull Request
