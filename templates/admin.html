@@ -53,6 +53,17 @@
         <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-body">
+                    <h3 class="card-title">Notification Management</h3>
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="{{ url_for('admin_create_notification') }}">Create Notification</a></li>
+                        <li class="list-group-item"><a href="{{ url_for('admin_manage_notifications') }}">Manage Notifications</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
                     <h3 class="card-title">System Monitoring</h3>
                     <ul class="list-group">
                         <li class="list-group-item"><a href="{{ url_for('admin_view_logs') }}">View Logs</a></li>

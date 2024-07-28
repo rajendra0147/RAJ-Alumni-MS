@@ -68,9 +68,6 @@ def create_admin_user():
         mongo.db.users.insert_one(admin_user)
         print("Admin user created successfully.")
 
-# mongo.db.users.insert_one(admin_user)
-# result = mongo.db.users.insert_one(admin_user)
-# print(f"Admin user created with id: {result.inserted_id}")
 
 # Define User model for authentication
 class User(UserMixin):
@@ -445,6 +442,12 @@ def admin_delete_discussion(discussion_id):
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    notifications = mongo.db.notifications.find({
+        "$or": [
+            {"recipients": "all"},
+            {"recipients": current_user.username}
+        ]
+    }).sort("created_at", -1)
     alumni = mongo.db.alumni.find_one({"_id": ObjectId(current_user.alumni_id)})
     print(alumni)
     if alumni:
@@ -454,7 +457,7 @@ def dashboard():
     recent_discussions = mongo.db.discussions.find({"author": current_user.username}).sort("_id", -1).limit(5)
     user_jobs = mongo.db.job_posts.find({"posted_by": current_user.username})
     user_mentorships = mongo.db.mentorships.find({"$or": [{"mentor_name": current_user.username}, {"mentee_name": current_user.username}]})
-    return render_template('dashboard.html', user=current_user, alumni=alumni, upcoming_events=upcoming_events, recent_discussions=recent_discussions, user_jobs=user_jobs, user_mentorships=user_mentorships)
+    return render_template('dashboard.html',notifications=notifications, user=current_user, alumni=alumni, upcoming_events=upcoming_events, recent_discussions=recent_discussions, user_jobs=user_jobs, user_mentorships=user_mentorships)
 
 @app.route('/profile')
 @login_required
@@ -503,11 +506,16 @@ def edit_profile():
         return redirect(url_for('view_profile'))
     return render_template('edit_profile.html', alumni=alumni)
 
-@app.route('/notifications')
+@app.route('/admin/manage_notifications')
 @login_required
-def notifications():
-    user_notifications = mongo.db.notifications.find({"user_id": ObjectId(current_user.id), "is_read": False})
-    return render_template('notifications.html', notifications=user_notifications)
+def admin_manage_notifications():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    user_notifications = mongo.db.notifications.find({"is_read": False})
+    return render_template('manage_notifications.html', notifications=user_notifications)
+
+
 
 @app.route('/mark_as_read/<int:notification_id>')
 @login_required
@@ -515,9 +523,106 @@ def mark_as_read(notification_id):
     mongo.db.notifications.update_one({"_id": ObjectId(notification_id), "user_id": ObjectId(current_user.id)}, {"$set": {"is_read": True}})
     return redirect(url_for('notifications'))
 
+@app.route('/admin/create_notification', methods=['GET', 'POST'])
+@login_required
+def admin_create_notification():
+    if not current_user.is_admin:
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        recipients = request.form.get('recipients')
+        message = request.form.get('message')
+        if recipients == "all":
+            recipients = "all"
+        else:
+            recipients = [recipients]
+
+        notification = {
+                "recipients": recipients,
+                'message': message,
+                'is_read': False,
+                'created_at': datetime.utcnow(),
+                'created_by': current_user.username
+            }
+        mongo.db.notifications.insert_one(notification)
+        flash('Notification created successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
+    
+    users = mongo.db.users.find()
+    return render_template('create_notification.html', users=users)
+
+
+@app.route('/admin/edit_notification/<notification_id>', methods=['GET', 'POST'])
+@login_required
+def admin_edit_notification(notification_id):
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+
+    notification = mongo.db.notifications.find_one({"_id": ObjectId(notification_id)})
+    if not notification:
+        flash('Discussion not found', 'danger')
+        return redirect(url_for('admin_manage_notifications'))
+
+    if request.method == 'POST':
+        message = request.form.get('message')
+        username = request.form.get('username')
+        mongo.db.notifications.update_one({"_id": ObjectId(notification_id)}, {"$set": {"username": username, "message": message, 'is_read':False}})
+        flash('Notification updated successfully', 'success')
+        return redirect(url_for('admin_manage_notifications'))
+
+    return render_template('edit_notification.html', discussion=notification)
+
+
+@app.route('/admin/delete_notification/<notification_id>', methods=['POST', 'GET'])
+@login_required
+def admin_delete_notification(notification_id):
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    if request.method == 'GET':
+        notification = mongo.db.notifications.find_one({"_id": ObjectId(notification_id)})
+        if not notification:
+            flash('Notification not found', 'danger')
+            return redirect(url_for('admin_manage_discussions'))
+
+        mongo.db.notifications.delete_one({"_id": ObjectId(notification_id)})
+        flash('Notification deleted successfully', 'success')
+    return redirect(url_for('admin_manage_notifications'))
+
+@app.route('/admin/delete_notifications', methods=['POST'])
+@login_required
+def admin_delete_notifications():
+    if not current_user.is_admin():
+        flash('You do not have permission to perform this action.', 'danger')
+        return redirect(url_for('admin_manage_users'))
+    notification_ids = request.form.getlist('notification_ids')
+    if notification_ids:
+        # Convert notification_ids to ObjectId and remove the notifications from the database
+        mongo.db.notifications.delete_many({'_id': {'$in': [ObjectId(notification_id) for notification_id in notification_ids]}})
+        flash(f'{len(notification_ids)} notification(s) deleted successfully.', 'success')
+    else:
+        flash('No Notification selected for deletion.', 'warning')
+
+    return redirect(url_for('admin_manage_notifications'))
+
+@app.route('/upload', methods=['POST'])
+@login_required
+def upload():
+    if 'photo' in request.files:
+        filename = photos.save(request.files['photo'])
+        current_user_profile = mongo.db.users.find_one({'_id': ObjectId(current_user.get_id())})
+        mongo.db.users.update_one({'_id': ObjectId(current_user.get_id())}, {'$set': {'profile_pic': filename}})
+        flash('Profile picture uploaded successfully!', 'success')
+    return redirect(url_for('view_profile'))
+
+
 @app.route('/create_discussion', methods=['GET', 'POST'])
 @login_required
 def create_discussion():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         topic = request.form.get('topic')
         content = request.form.get('content')

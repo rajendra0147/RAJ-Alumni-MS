@@ -22,6 +22,22 @@
     </section>
 
     <section class="mb-5">
+        <h2>Notifications</h2>
+        {% if notifications %}
+            <ul class="list-group">
+                {% for notification in notifications %}
+                    <li class="list-group-item">
+                        <p>{{ notification.message }}</p>
+                        <small>Sent by {{ notification.created_by }} on {{ notification.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No notifications.</p>
+        {% endif %}
+    </section>
+
+    <section class="mb-5">
         <h2>Upcoming Events</h2>
         {% if upcoming_events %}
             <ul class="list-group">

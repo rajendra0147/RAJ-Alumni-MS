@@ -1,0 +1,25 @@
+<!-- ./templates/create_notification.html -->
+
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Create Notification</h2>
+    <form method="post" action="{{ url_for('admin_create_notification') }}">
+        <div class="mb-3">
+            <label for="recipients" class="form-label">Recipients</label>
+            <select class="form-control" id="recipients" name="recipients" required>
+                <option value="all">All Users</option>
+                {% for user in users %}
+                    <option value="{{ user.username }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            <textarea tabindex="0" class="form-control" id="message" name="message" rows="3" placeholder="Enter Message" required></textarea>
+        </div>
+        <button class="btn btn-primary" tabindex="0" type="submit">Create Notification</button>
+    </form>
+</div>
+{% endblock %}
