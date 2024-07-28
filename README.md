@@ -40,7 +40,8 @@ Welcome to the Alumni Management System ! This web application is designed to ma
 
 4. **Set Up Environment Variables:**
 
-Create a `.env` file in the root directory of the project and add the following variables:
+    ### Create a `.env` file in the root directory of the project and add the following variables:
+
     ```bash
     SECRET_KEY=your_secret_key
     MONGO_URI=your_mongo_uri
@@ -51,7 +52,7 @@ Create a `.env` file in the root directory of the project and add the following 
 
 5. **Run the Application:**
 
-Run the application in Virtual Environment 
+    ### Run the application in Virtual Environment 
 
     ```bash
     python app-using-mongodb.py
