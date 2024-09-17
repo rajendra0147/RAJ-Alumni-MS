@@ -4,22 +4,45 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2>Events</h2>
-    <a tabindex="0" href="{{ url_for('create_event') }}" class="btn btn-primary mb-3">Create New Event</a>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-4">Events</h1>
+        <a tabindex="0" href="{{ url_for('create_event') }}" class="btn btn-primary mb-3">Create New Event</a>
+    </div>
     <div>
-        <h3>Upcoming Events</h3>
+        {% if user_events %}
+        <h2>Posted Events</h2>
         <ul class="list-group">
-            {% for event in events %}
+            {% for event in user_events %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <div>
-                    <a tabindex="0" href="{{ url_for('view_event', event_id=event._id) }}" class="fw-bold">{{ event.title }}</a>
+                    <a tabindex="0" href="{{ url_for('view_event', event_id=event._id) }}" class="fw-bold btn btn-primary">{{ event.title }}</a>
                     <div class="text-muted">
-                        ({{ event.date }}, {{ event.location }}, {{ event.description }})
+                        <p><strong>Date: </strong> {{ event.date }}</p>
+                        <p><strong>Location: </strong> {{ event.location }}</p>
+                        <p><strong>Description: </strong> {{ event.description }}</p>
+                        <p><strong>Posted By: </strong> {{ event.posted_by }}</p>
                     </div>
                 </div>
                 <div>
                     <a tabindex="0" href="{{ url_for('edit_event', event_id=event._id) }}" class="btn btn-warning btn-sm me-2">Edit</a>
-                    <a tabindex="0" href="{{ url_for('rsvp_event', event_id=event._id) }}" class="btn btn-success btn-sm">RSVP</a>
+                    <!-- <a tabindex="0" href="{{ url_for('rsvp_event', event_id=event._id) }}" class="btn btn-success btn-sm">RSVP</a> -->
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <ul class="list-group">
+            <h2>All Events</h2>
+            {% for event in events %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <a tabindex="0" href="{{ url_for('view_event', event_id=event._id) }}" class="fw-bold btn btn-primary">{{ event.title }}</a>
+                    <div class="text-muted">
+                        <p><strong>Date: </strong> {{ event.date }}</p>
+                        <p><strong>Location: </strong> {{ event.location }}</p>
+                        <p><strong>Description: </strong> {{ event.description }}</p>
+                        <p><strong>Posted By: </strong> {{ event.posted_by }}</p>
+                    </div>
                 </div>
             </li>
             {% endfor %}

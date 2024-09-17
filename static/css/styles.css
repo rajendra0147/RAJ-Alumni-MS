@@ -4,7 +4,7 @@ body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #F8F9FA;
+    background-image: url(/static/image/alu_bg.jpg);
     color: #343A40;
     padding-bottom: 4em;
     transition: background-color 0.3s;
@@ -15,12 +15,23 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Montserrat', sans-serif;
-    color: #343A40;
+    color: #000000  ;
+    font-weight: 500;
+}
+
+h2 {
+    font-weight: bold;
 }
 
 img {
     max-width: 100%;
     height: auto;
+}
+
+#logo {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
 }
 
 ul {
@@ -39,8 +50,7 @@ section {
 /* Header and Navigation */
 
 header {
-    position: -webkit-sticky;
-    position: sticky;
+    position:relative;
     top: 0;
     z-index: 1000;
     background-color: #333;
@@ -90,10 +100,7 @@ nav a {
     transition: color 0.3s, transform 0.3s;
 }
 
-nav a:hover {
-    color: #adb5bd;
-    transform: scale(1.1);
-}
+
 
 nav .icon {
     width: 20px;
@@ -102,30 +109,6 @@ nav .icon {
     margin-right: 0.5em;
 }
 
-
-.main-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.main-nav .menu {
-    display: flex;
-    gap: 1rem;
-}
-
-
-.main-nav .menu-icon {
-    display: none;
-    cursor: pointer;
-}
-
-
-
-.main-nav .menu-icon i {
-    font-size: 1.5rem;
-    color: white;
-}
 
 
 
@@ -229,15 +212,25 @@ button:hover {
 }
 
 /* Footer */
+
 footer {
     background-color: #343A40;
     color: #FFFFFF;
     text-align: center;
     padding: 1em 0;
-    /* position: fixed; */
+    position: relative;
     width: 100%;
-    /* bottom: 0; */
+    bottom: 0;
+    z-index: 1000;
     transition: background-color 0.3s;
+}
+
+
+header {
+    position:relative;
+    top: 0;
+    z-index: 1000;
+    background-color: #333;
 }
 
 .flashes {
@@ -284,24 +277,12 @@ header nav a {
 
 /* Tablet Styles */
 @media (max-width: 768px) {
+
     header nav {
-        /* flex-direction: row; */
         flex-direction: column;
         justify-content: space-between;
-    }
-
-    .main-nav .menu {
-        display: none;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .main-nav .menu-icon {
-        display: block;
-    }
-
-    .main-nav.active .menu {
-        display: flex;
+        text-align: center;
+        
     }
 
 
@@ -347,6 +328,5 @@ header nav a {
     footer {
         padding: 1.5em 0;
     }
-
 
 } 

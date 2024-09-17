@@ -95,9 +95,31 @@ def load_user(user_id):
 # Routes and view functions
 @app.route('/')
 def home():
+    notifications = mongo.db.notifications.find({}).sort("_id", -1).limit(5)
     upcoming_events = mongo.db.events.find({"date": {"$gte": datetime.today()}}).sort("date", 1).limit(5)
     recent_discussions = mongo.db.discussions.find().sort("_id", -1).limit(5)
-    return render_template('home.html', upcoming_events=upcoming_events, recent_discussions=recent_discussions)
+    job_posts = mongo.db.job_posts.find().sort("_id", -1).limit(5)
+    mentorships = mongo.db.mentorships.find().sort("_id", -1).limit(5)
+    return render_template('home.html', upcoming_events=upcoming_events, recent_discussions=recent_discussions, notifications=notifications, job_posts=job_posts, mentorships=mentorships)
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    notifications = mongo.db.notifications.find({
+        "$or": [
+            {"recipients": "all"},
+            {"recipients": current_user.username}
+        ]
+    }).sort("created_at", -1)
+    alumni = mongo.db.alumni.find_one({"_id": ObjectId(current_user.alumni_id)})
+    print(alumni)
+    upcoming_events = mongo.db.events.find({"date": {"$gte": datetime.today()}}).sort("date", 1).limit(5)
+    recent_discussions = mongo.db.discussions.find({"author": current_user.username}).sort("_id", -1).limit(5)
+    user_jobs = mongo.db.job_posts.find({"posted_by": current_user.username})
+    # user_mentorships = mongo.db.mentorships.find({"$or": [{"mentor_name": current_user.username}, {"mentee_name": current_user.username}]})
+    user_mentorships = mongo.db.mentorships.find({"posted_by": current_user.username})
+    user_events = mongo.db.events.find({"posted_by": current_user.username})
+    return render_template('dashboard.html',notifications=notifications, user=current_user, alumni=alumni, upcoming_events=upcoming_events, recent_discussions=recent_discussions, user_jobs=user_jobs, user_mentorships=user_mentorships,user_events=user_events)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -247,11 +269,13 @@ def admin_create_mentorship():
         mentee_name = request.form.get('mentee_name')
         contact_info = request.form.get('contact_info')
         details = request.form.get('details')
+        posted_by = request.form.get('posted_by')
         new_mentorship = {
             "mentor_name": mentor_name,
             "mentee_name": mentee_name,
             "details": details,
-            "contact_info": contact_info
+            "contact_info": contact_info,
+            "posted_by":posted_by
         }
         mongo.db.mentorships.insert_one(new_mentorship)
         flash('Mentorship created successfully!', 'success')
@@ -439,25 +463,6 @@ def admin_delete_discussion(discussion_id):
 
 
 
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    notifications = mongo.db.notifications.find({
-        "$or": [
-            {"recipients": "all"},
-            {"recipients": current_user.username}
-        ]
-    }).sort("created_at", -1)
-    alumni = mongo.db.alumni.find_one({"_id": ObjectId(current_user.alumni_id)})
-    print(alumni)
-    if alumni:
-        upcoming_events = mongo.db.events.find({"_id": {"$in": alumni.get('events', [])}, "date": {"$gte": datetime.today()}})
-    else:
-        upcoming_events = []
-    recent_discussions = mongo.db.discussions.find({"author": current_user.username}).sort("_id", -1).limit(5)
-    user_jobs = mongo.db.job_posts.find({"posted_by": current_user.username})
-    user_mentorships = mongo.db.mentorships.find({"$or": [{"mentor_name": current_user.username}, {"mentee_name": current_user.username}]})
-    return render_template('dashboard.html',notifications=notifications, user=current_user, alumni=alumni, upcoming_events=upcoming_events, recent_discussions=recent_discussions, user_jobs=user_jobs, user_mentorships=user_mentorships)
 
 @app.route('/profile')
 @login_required
@@ -561,7 +566,7 @@ def admin_edit_notification(notification_id):
 
     notification = mongo.db.notifications.find_one({"_id": ObjectId(notification_id)})
     if not notification:
-        flash('Discussion not found', 'danger')
+        flash('Notification not found', 'danger')
         return redirect(url_for('admin_manage_notifications'))
 
     if request.method == 'POST':
@@ -620,9 +625,6 @@ def upload():
 @app.route('/create_discussion', methods=['GET', 'POST'])
 @login_required
 def create_discussion():
-    if not current_user.is_admin():
-        flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('dashboard'))
     if request.method == 'POST':
         topic = request.form.get('topic')
         content = request.form.get('content')
@@ -642,8 +644,9 @@ def create_discussion():
 @app.route('/discussions')
 @login_required
 def list_discussions():
+    user_discussions = mongo.db.discussions.find({"author":current_user.username})
     all_discussions = mongo.db.discussions.find().sort("_id", -1)
-    return render_template('discussions.html', discussions=all_discussions)
+    return render_template('discussions.html', discussions=all_discussions, user_discussions=user_discussions)
 
 @app.route('/discussion/<discussion_id>', methods=['GET', 'POST'])
 @login_required
@@ -691,7 +694,9 @@ def edit_discussion(discussion_id):
 @login_required
 def list_events():
     all_events = mongo.db.events.find()
-    return render_template('events.html', events=all_events)
+    user_events = mongo.db.events.find({"posted_by": current_user.username})
+    print(user_events)
+    return render_template('events.html', events=all_events, user_events=user_events)
 
 @app.route('/event/<event_id>')
 @login_required
@@ -715,7 +720,8 @@ def create_event():
             "title": title,
             "description": description,
             "date": datetime.strptime(date, '%Y-%m-%d'),
-            "location":location
+            "location":location,
+            "posted_by":current_user.username
         }
         mongo.db.events.insert_one(new_event)
         flash('Event created successfully!', 'success')
@@ -734,7 +740,7 @@ def edit_event(event_id):
             "title": request.form.get('title'),
             "description": request.form.get('description'),
             "date": datetime.strptime(request.form.get('date'), '%Y-%m-%d'),
-            "location": request.form.get('location')
+            "location": request.form.get('location'),
         }
         mongo.db.events.update_one({"_id": ObjectId(event_id)}, {"$set": updated_event})
         flash('Event updated successfully!', 'success')
@@ -770,8 +776,9 @@ def rsvp_event(event_id):
 @app.route('/jobs')
 @login_required
 def list_jobs():
+    user_jobs = mongo.db.job_posts.find({"posted_by":current_user.username})
     all_jobs = mongo.db.job_posts.find()
-    return render_template('jobs.html', jobs=all_jobs)
+    return render_template('jobs.html', jobs=all_jobs,user_jobs=user_jobs)
 
 @app.route('/job/<job_id>')
 @login_required
@@ -825,8 +832,9 @@ def edit_job(job_id):
 @app.route('/mentorships')
 @login_required
 def list_mentorships():
+    user_mentorships = mongo.db.mentorships.find({"posted_by":current_user.username})
     all_mentorships = mongo.db.mentorships.find()
-    return render_template('mentorships.html', mentorships=all_mentorships)
+    return render_template('mentorships.html', mentorships=all_mentorships, user_mentorships=user_mentorships)
 
 @app.route('/mentorship/<mentorship_id>')
 @login_required
@@ -850,7 +858,8 @@ def create_mentorship():
             "mentor_name": mentor_name,
             "mentee_name": mentee_name,
             "details": details,
-            "contact_info": contact_info
+            "contact_info": contact_info,
+            "posted_by": current_user.username
         }
         mongo.db.mentorships.insert_one(new_mentorship)
         flash('Mentorship created successfully!', 'success')

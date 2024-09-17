@@ -3,43 +3,98 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Welcome to the Alumni Management System</h1>
+    <section class="jumbotron text-center bg-light py-5">
+        <div class="container">
+            <h1 class="jumbotron-heading">Welcome to the Alumni Management System</h1>
+            <p class="lead text-muted">Connect, Share, and Grow with your Alumni Network.</p>
+            {% if current_user.is_authenticated %}
+            <p>Hello, {{ current_user.username }}! Welcome back.</p>
+            {% else %}
+            <p>
+                <a tabindex="0" href="{{ url_for('register') }}" class="btn btn-primary my-2">Join Now</a>
+                <a tabindex="0" href="{{ url_for('login') }}" class="btn btn-secondary my-2">Login</a>
+            </p>
+            {% endif %}
+        </div>
+    </section>
     
-    {% if current_user.is_authenticated %}
-        <p>Hello, {{ current_user.username }}! Welcome back.</p>
-    {% else %}
-        <p>Welcome! Please <a tabindex="0" href="{{ url_for('login') }}" class="btn btn-link" >log in</a> or <a tabindex="0" href="{{ url_for('register') }}" class="btn btn-link">register</a> to get started.</p>
+    {% if notifications %}
+    <section class="mb-5"></section>
+        <h2>New Notifications</h2>
+            <ul class="list-group">
+                {% for notification in notifications %}
+                    <li class="list-group-item">
+                        <p>{{ notification.message }}</p>
+                        <small>Sent by {{ notification.created_by }} on {{ notification.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+    </section>
     {% endif %}
     
-    <h2 class="mt-5">Upcoming Events</h2>
     {% if upcoming_events %}
-        <ul class="list-group mb-4">
-            {% for event in upcoming_events %}
-                <li class="list-group-item">
-                    <h3 class="mb-1">{{ event.title }}</h3>
-                    <p class="mb-1">{{ event.date.strftime('%B %d, %Y') }} at {{ event.location }}</p>
-                    <p class="mb-1">{{ event.description }}</p>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No upcoming events.</p>
+    <section class="mb-5">
+        <h2 class="mt-5">Upcoming Events</h2>
+            <ul class="list-group mb-4">
+                {% for event in upcoming_events %}
+                    <li class="list-group-item">
+                        <h3 class="mb-1">{{ event.title }}</h3>
+                        <p class="mb-1">{{ event.date.strftime('%B %d, %Y') }} at {{ event.location }}</p>
+                        <p class="mb-1">{{ event.description }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+    </section>
     {% endif %}
     
-    <h2 class="mt-5">Recent Discussions</h2>
     {% if recent_discussions %}
-        <ul class="list-group mb-4">
-            {% for discussion in recent_discussions %}
-                <li class="list-group-item">
-                    <h3 class="mb-1">{{ discussion.topic }}</h3>
-                    <p class="mb-1">by {{ discussion.author }} in {{ discussion.category }}</p>
-                    <p class="mb-1">{{ discussion.content }}</p>
-                    <a tabindex="0" href="{{ url_for('view_discussion', discussion_id=discussion.id) }}" class="btn btn-primary btn-sm">Read more</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No recent discussions.</p>
+    <section class="mb-5">
+        <h2 class="mt-5">Discussions</h2>
+            <ul class="list-group mb-4">
+                {% for discussion in recent_discussions %}
+                    <li class="list-group-item">
+                        <h3 class="mb-1">{{ discussion.topic }}</h3>
+                        <p class="mb-1">by {{ discussion.author }} in {{ discussion.category }}</p>
+                        <p class="mb-1">{{ discussion.content }}</p>
+                        <a tabindex="0" href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" class="btn btn-primary btn-sm">Read more</a>
+                    </li>
+                {% endfor %}
+            </ul>
+    </section>
     {% endif %}
+
+
+
+    
+    {% if job_posts %}
+    <section class="mb-5">
+        <h2>Job Postings</h2>
+            <ul class="list-group">
+                {% for job in job_posts %}
+                    <li class="list-group-item">
+                        <h3>{{ job.title }}</h3>
+                        <p>{{ job.company }} - {{ job.location }}</p>
+                        <p>{{ job.description }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+    </section>
+    {% endif %}
+
+    {% if mentorships %}
+    <section class="mb-5">
+        <h2>Mentorship Opportunities</h2>
+            <ul class="list-group">
+                {% for mentorship in mentorships %}
+                    <li class="list-group-item">
+                        <h3>{{ mentorship.mentor_name }} mentoring {{ mentorship.mentee_name }}</h3>
+                        <p>{{ mentorship.details }}</p>
+                        <p><strong>Contact:</strong> {{ mentorship.contact_info }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+    </section>
+    {% endif %}
+
 </div>
 {% endblock %}

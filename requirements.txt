@@ -1,3 +1,4 @@
+# pip freeze > requirements.txt
 # pip install -r requirements.txt
 
 alembic==1.13.2
@@ -23,8 +24,8 @@ pillow==10.4.0
 psycopg2==2.9.9
 psycopg2-binary==2.9.9
 pymongo==4.8.0
+python-dotenv==1.0.1
 SQLAlchemy==2.0.31
 typing_extensions==4.12.2
 Werkzeug==3.0.3
 WTForms==3.1.2
-python-dotenv
