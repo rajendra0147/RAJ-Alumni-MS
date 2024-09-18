@@ -20,7 +20,7 @@
             {% for notification in notifications %}
             <tr>
                 <td><input type="checkbox" name="notification_ids" value="{{ notification._id }}"></td>
-                <td>{{ notification.username }}</td>
+                <td>{{ notification.recipients | join(', ')}}</td>
                 <td>{{ notification.message }}</td>
                 <td>{{ notification.created_by }}</td>
                 <td>
@@ -32,6 +32,7 @@
         </tbody>
     </table>
     <button type="submit" class="btn btn-danger">Delete Selected</button>
+    </form>
 </div>
 <script>
     document.getElementById('selectAll').addEventListener('click', function(event) {

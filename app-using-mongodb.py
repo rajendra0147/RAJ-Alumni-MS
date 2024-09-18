@@ -4,6 +4,7 @@ from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
+import bcrypt
 from flask_pymongo import PyMongo
 from bson import ObjectId
 from pymongo import MongoClient
@@ -59,7 +60,8 @@ def create_admin_user():
         print("Admin user already exists. Skipping creation.")
     else:
         # Hash the password before storing it
-        hashed_password = generate_password_hash(admin_password, method='pbkdf2:sha256')
+        # hashed_password = generate_password_hash(admin_password, method='pbkdf2:sha256')
+        hashed_password = bcrypt.hashpw(admin_password.encode('utf-8'), bcrypt.gensalt())
         admin_user = {
             "username": admin_username,
             "password": hashed_password,
@@ -125,14 +127,16 @@ def dashboard():
 def register():
     if request.method == 'POST':
         username = request.form.get('username')
-        password = request.form.get('password')
+        # password = request.form.get('password')
+        password = request.form.get('password').encode('utf-8')
         role = request.form.get('role', 'User')
         existing_user = mongo.db.users.find_one({"username": username})
         if existing_user:
             flash('Username already exists. Please choose a different username.', 'danger')
             return redirect(url_for('register'))
         elif username and password:
-            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            # hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
             new_user = {"username": username, "password": hashed_password, "role":role}
             mongo.db.users.insert_one(new_user)
             flash('Registration successful! Please log in.', 'success')
@@ -145,9 +149,11 @@ def register():
 def login():
     if request.method == 'POST':
         username = request.form.get('username')
-        password = request.form.get('password')
+        # password = request.form.get('password')
+        password = request.form.get('password').encode('utf-8')
         user = mongo.db.users.find_one({"username": username})
-        if user and check_password_hash(user['password'], password):
+        # if user and check_password_hash(user['password'], password):
+        if user and bcrypt.checkpw(password, user['password']):
             print(f"login: username={username}, user={user}")  # Debugging statement
             user_obj = User(user)
             login_user(user_obj)
@@ -165,6 +171,32 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route('/update_password', methods=['GET', 'POST'])
+@login_required
+def update_password():
+    if current_user.is_authenticated:
+        user = mongo.db.users.find_one({'username':current_user.username})
+        print(user)
+        if request.method == 'POST':
+            old_password = request.form['old_password'].encode('utf-8')
+            # old_hashed_password = generate_password_hash(old_password, method='pbkdf2:sha256')
+            if bcrypt.checkpw(old_password, user['password']):
+            # if check_password_hash(old_hashed_password, user['password']):
+                new_password = request.form['new_password'].encode('utf-8')
+                hashed_password = bcrypt.hashpw(new_password, bcrypt.gensalt())
+                # hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
+                mongo.db.users.update_one({"_id": user["_id"]}, {"$set": {"password":hashed_password}})
+                flash('Password updated successfully!', 'success')
+                return redirect(url_for('logout'))
+            else:       
+                flash('Old password is incorrect.', 'danger')
+                return redirect(url_for('update_password'))
+        return render_template('change_password.html')
+    else:
+        return redirect(url_for('index'))
+
+
+
 @app.route('/admin')
 @login_required
 def admin_dashboard():
@@ -181,9 +213,11 @@ def admin_create_user():
         return redirect(url_for('dashboard'))
     if request.method == 'POST':
         username = request.form.get('username')
-        password = request.form.get('password')
+        # password = request.form.get('password')
+        password = request.form.get('password').encode('utf-8')
         role = request.form.get('role')
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        # hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        hashed_password = bcrypt.hashpw(password, bcrypt.gensalt())
         new_user = {"username": username, "password": hashed_password, "role": role}
         mongo.db.users.insert_one(new_user)
         flash('User created successfully', 'success')
@@ -371,8 +405,11 @@ def admin_delete_user(user_id):
             flash('User not found', 'danger')
             return redirect(url_for('admin_manage_users'))
 
-        mongo.db.users.delete_one({"_id": ObjectId(user_id)})
-        flash('User deleted successfully', 'success')
+        if user.username == 'admin':
+            flash('Admin Cannot be deleted', 'danger')
+        else:
+            mongo.db.users.delete_one({"_id": ObjectId(user_id)})
+            flash('User deleted successfully', 'success')
     return redirect(url_for('admin_manage_users'))
 
 @app.route('/admin/delete_users', methods=['POST'])
@@ -384,7 +421,20 @@ def admin_delete_users():
     user_ids = request.form.getlist('user_ids')
     if user_ids:
         # Convert user_ids to ObjectId and remove the users from the database
-        mongo.db.users.delete_many({'_id': {'$in': [ObjectId(user_id) for user_id in user_ids]}})
+        admin_id = ObjectId(current_user.id)
+
+        # mongo.db.users.delete_many({'_id': {'$in': [ObjectId(user_id)  for user_id in user_ids  ]}})
+        # flash(f'{len(user_ids)} user(s) deleted successfully.', 'success')
+
+        ids = []
+        for user_id in user_ids:
+            if ObjectId(user_id) != admin_id:
+                ids.append(ObjectId(user_id))
+            else:
+                flash('Admin Cannot be deleted', 'danger')
+                return redirect(url_for('admin_manage_users'))
+        
+        mongo.db.users.delete_many({'_id': {'$in': ids}})
         flash(f'{len(user_ids)} user(s) deleted successfully.', 'success')
     else:
         flash('No users selected for deletion.', 'warning')
@@ -517,16 +567,20 @@ def admin_manage_notifications():
     if not current_user.is_admin():
         flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('dashboard'))
-    user_notifications = mongo.db.notifications.find({"is_read": False})
+    user_notifications = mongo.db.notifications.find()
     return render_template('manage_notifications.html', notifications=user_notifications)
 
 
 
-@app.route('/mark_as_read/<int:notification_id>')
+@app.route('/mark_as_read/<notification_id>')
 @login_required
 def mark_as_read(notification_id):
-    mongo.db.notifications.update_one({"_id": ObjectId(notification_id), "user_id": ObjectId(current_user.id)}, {"$set": {"is_read": True}})
-    return redirect(url_for('notifications'))
+    notification = mongo.db.notifications.find_one({"_id": ObjectId(notification_id)})
+    if notification:
+        mongo.db.notifications.update_one({"_id": ObjectId(notification_id)}, {"$set": {"is_read": True}})
+    else:
+        flash('Notification not found or you do not have permission to mark it as read.', 'danger')
+    return redirect(url_for('dashboard'))
 
 @app.route('/admin/create_notification', methods=['GET', 'POST'])
 @login_required
@@ -535,12 +589,12 @@ def admin_create_notification():
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
-        recipients = request.form.get('recipients')
+        recipients = request.form.getlist('recipients')
         message = request.form.get('message')
         if recipients == "all":
             recipients = "all"
         else:
-            recipients = [recipients]
+            recipients = recipients
 
         notification = {
                 "recipients": recipients,
@@ -571,12 +625,25 @@ def admin_edit_notification(notification_id):
 
     if request.method == 'POST':
         message = request.form.get('message')
-        username = request.form.get('username')
-        mongo.db.notifications.update_one({"_id": ObjectId(notification_id)}, {"$set": {"username": username, "message": message, 'is_read':False}})
+        recipients = request.form.getlist('recipients')
+        if recipients == "all":
+            recipients = "all"
+        else:
+            recipients = recipients
+
+        notification = {
+                "recipients": recipients,
+                'message': message,
+                'is_read': False,
+                'created_at': datetime.utcnow(),
+                'created_by': current_user.username
+            }
+        
+        mongo.db.notifications.update_one({"_id": ObjectId(notification_id)}, {"$set": notification})
         flash('Notification updated successfully', 'success')
         return redirect(url_for('admin_manage_notifications'))
-
-    return render_template('edit_notification.html', discussion=notification)
+    users = mongo.db.users.find()
+    return render_template('edit_notification.html', notification=notification, users=users)
 
 
 @app.route('/admin/delete_notification/<notification_id>', methods=['POST', 'GET'])

@@ -29,6 +29,11 @@
                 <li class="list-group-item">
                     <p>{{ notification.message }}</p>
                     <small>Sent by {{ notification.created_by }} on {{ notification.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    {% if notification.is_read == True %}
+                    <button class="btn btn-primary disabled"><i class="fas fa-check-double"></i> Read</button>
+                    {% else %}
+                    <a tabindex="0" href="{{ url_for('mark_as_read', notification_id=notification._id) }}" class="btn btn-danger">Mark as Read</a>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

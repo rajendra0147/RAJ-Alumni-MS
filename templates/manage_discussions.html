@@ -19,7 +19,7 @@
                 <td>{{ discussion.topic }}</td>
                 <td>{{ discussion.content }}</td>
                 <td>
-                    <a class="btn btn-primary btn-sm" href="{{ url_for('admin_edit_discussion', discussion_id=discussion._id) }}">Edit</a>
+                    <!-- <a class="btn btn-primary btn-sm" href="{{ url_for('admin_edit_discussion', discussion_id=discussion._id) }}">Edit</a> -->
                     <a class="btn btn-danger btn-sm" href="{{ url_for('admin_delete_discussion', discussion_id=discussion._id) }}" onclick="return confirm('Are you sure?')">Delete</a>
                 </td>
             </tr>

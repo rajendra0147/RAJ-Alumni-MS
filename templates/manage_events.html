@@ -22,7 +22,7 @@
                 <td>{{ event.description }}</td>
                 <td>{{ event.date }}</td>
                 <td>
-                    <a class="btn btn-primary btn-sm" href="{{ url_for('edit_event', event_id=event._id) }}">Edit</a>
+                    <!-- <a class="btn btn-primary btn-sm" href="{{ url_for('edit_event', event_id=event._id) }}">Edit</a> -->
                     <a class="btn btn-danger btn-sm" href="{{ url_for('admin_delete_event', event_id=event._id) }}" onclick="return confirm('Are you sure?')">Delete</a>
                 </td>
             </tr>
