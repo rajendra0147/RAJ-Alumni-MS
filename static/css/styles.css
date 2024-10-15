@@ -1,10 +1,48 @@
 
 /* ./static/css/styles.css  */
+
+
+
+/* Jumbotron style */
+.bg-light {
+    background-color: #f8f9fa !important;
+}
+
+.section-heading {
+    font-weight: bold;
+}
+
+/* Adding some hover effect for list-group items */
+.list-group-item-action:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+/* Style for badges in notifications */
+.badge {
+    font-size: 0.9rem;
+}
+
+/* Card styling to match the colorful theme */
+.card {
+    border: 1px solid #e0e0e0;
+    border-radius: 0.75rem;
+}
+
+.card-title {
+    color: #007bff;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
 body {
     font-family: 'Montserrat', sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url(/static/image/alu_bg.jpg);
+    /* background-image: url(/static/image/alu_bg.jpg); */
+    background-color: #e0e0e0;
     color: #343A40;
     padding-bottom: 4em;
     transition: background-color 0.3s;

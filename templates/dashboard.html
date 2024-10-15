@@ -1,84 +1,95 @@
-<!-- ./templates/dashboard.html -->
 {% extends "layout.html" %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Dashboard</h1>
+    <h1 class="mb-4 fw-bold"><i class="fa fa-dashboard"></i> DASHBOARD</h1>
 
+    <!-- Profile Section -->
     <section class="mb-5">
-        <h2>Profile</h2>
-        <div class="card p-3">
+        <h2 class="text-primary">Profile</h2>
+        <div class="card shadow-sm p-4">
             {% if alumni %}
                 <p><strong>Name:</strong> {{ alumni.name }}</p>
                 <p><strong>Graduation Year:</strong> {{ alumni.graduation_year }}</p>
                 <p><strong>Industry:</strong> {{ alumni.industry }}</p>
                 <p><strong>Contact Details:</strong> {{ alumni.contact_details }}</p>
-                <a tabindex="0" href="{{ url_for('edit_profile', alumni_id=alumni.id) }}" class="btn btn-primary">Edit Profile</a>
+                <a tabindex="0" href="{{ url_for('edit_profile', alumni_id=alumni._id) }}" class="btn btn-outline-primary mt-3">Edit Profile</a>
             {% else %}
                 <p>You have not created a profile yet.</p>
-                <a tabindex="0" href="{{ url_for('create_profile') }}" class="btn btn-primary">Create Profile</a>
+                <a tabindex="0" href="{{ url_for('create_profile') }}" class="btn btn-outline-primary mt-3">Create Profile</a>
             {% endif %}
         </div>
     </section>
 
+    <!-- Notifications Section -->
     {% if notifications %}
     <section class="mb-5">
-        <h2>Your Notifications</h2>
-        <ul class="list-group">
+        <h2 class="text-primary">Your Notifications</h2>
+        <ul class="list-group shadow-sm">
             {% for notification in notifications %}
-                <li class="list-group-item">
-                    <p>{{ notification.message }}</p>
-                    <small>Sent by {{ notification.created_by }} on {{ notification.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-                    {% if notification.is_read == True %}
-                    <button class="btn btn-primary disabled"><i class="fas fa-check-double"></i> Read</button>
-                    {% else %}
-                    <a tabindex="0" href="{{ url_for('mark_as_read', notification_id=notification._id) }}" class="btn btn-danger">Mark as Read</a>
-                    {% endif %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="mb-1">{{ notification.message }}</p>
+                        <small class="text-muted">Sent by {{ notification.created_by }} on {{ notification.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                    </div>
+                        {% if current_user.username in notification.read_by %}
+                        <button class="btn btn-outline-success disabled"><i class="fas fa-check-double"></i> Read</button>
+                        {% else %}
+                        <a tabindex="0" href="{{ url_for('mark_as_read', notification_id=notification._id) }}" class="btn btn-danger">Mark as Read</a>
+                        {% endif %}
+
                 </li>
             {% endfor %}
         </ul>
     </section>
     {% endif %}
 
-    
+    <!-- User's Posted Events Section -->
     {% if user_events %}
     <section class="mb-5">
-        <h2>Your Posted Events</h2>
-        <ul class="list-group">
+        <h2 class="text-primary">Your Posted Events</h2>
+        <div class="row">
             {% for event in user_events %}
-                <li class="list-group-item">
-                    <h3>{{ event.title }}</h3>
-                    <p>{{ event.date.strftime('%B %d, %Y') }} at {{ event.location }}</p>
-                    <p>{{ event.description }}</p>
-                </li>
+                <div class="col-md-6">
+                    <div class="card mb-4 shadow-sm">
+                        <a href="{{ url_for('view_event', event_id=event._id) }}" class="list-group-item list-group-item-action">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ event.title }}</h5>
+                                <p class="card-text">{{ event.date.strftime('%B %d, %Y') }} at {{ event.location }}</p>
+                                <p class="card-text">{{ event.description }}</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
             {% endfor %}
-        </ul>
+        </div>
     </section>
     {% endif %}
-    
+
+    <!-- Discussions Section -->
     {% if recent_discussions %}
     <section class="mb-5">
-        <h2>Your Discussions</h2>
-        <ul class="list-group">
+        <h2 class="text-primary">Your Discussions</h2>
+        <ul class="list-group shadow-sm">
             {% for discussion in recent_discussions %}
                 <li class="list-group-item">
-                    <h3>{{ discussion.topic }}</h3>
+                    <h5 class="text-primary">{{ discussion.topic }}</h5>
                     <p>{{ discussion.content }}</p>
-                    <a tabindex="0" href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" class="btn btn-primary">View Discussion</a>
+                    <a tabindex="0" href="{{ url_for('view_discussion', discussion_id=discussion._id) }}" class="btn btn-outline-primary mt-2">View Discussion</a>
                 </li>
             {% endfor %}
         </ul>
     </section>
     {% endif %}
-            
 
+    <!-- Job Postings Section -->
     {% if user_jobs %}
     <section class="mb-5">
-        <h2>Your Job Postings</h2>
-        <ul class="list-group">
+        <h2 class="text-primary">Your Job Postings</h2>
+        <ul class="list-group shadow-sm">
             {% for job in user_jobs %}
                 <li class="list-group-item">
-                    <h3>{{ job.title }}</h3>
+                    <h5 class="text-primary">{{ job.title }}</h5>
                     <p>{{ job.company }} - {{ job.location }}</p>
                     <p>{{ job.description }}</p>
                 </li>
@@ -87,13 +98,14 @@
     </section>
     {% endif %}
 
+    <!-- Mentorship Section -->
     {% if user_mentorships %}
     <section class="mb-5">
-        <h2>Your Mentoring Post</h2>
-        <ul class="list-group">
+        <h2 class="text-primary">Your Mentoring Post</h2>
+        <ul class="list-group shadow-sm">
             {% for mentorship in user_mentorships %}
                 <li class="list-group-item">
-                    <h3>{{ mentorship.mentor_name }} mentoring {{ mentorship.mentee_name }}</h3>
+                    <h5 class="text-primary">{{ mentorship.mentor_name }} mentoring {{ mentorship.mentee_name }}</h5>
                     <p>{{ mentorship.details }}</p>
                     <p><strong>Contact:</strong> {{ mentorship.contact_info }}</p>
                 </li>
@@ -101,6 +113,5 @@
         </ul>
     </section>
     {% endif %}
-
 </div>
 {% endblock %}

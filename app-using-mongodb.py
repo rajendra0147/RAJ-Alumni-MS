@@ -421,7 +421,7 @@ def admin_delete_users():
     user_ids = request.form.getlist('user_ids')
     if user_ids:
         # Convert user_ids to ObjectId and remove the users from the database
-        admin_id = ObjectId(current_user.id)
+        admin_id = ObjectId(current_user._id)
 
         # mongo.db.users.delete_many({'_id': {'$in': [ObjectId(user_id)  for user_id in user_ids  ]}})
         # flash(f'{len(user_ids)} user(s) deleted successfully.', 'success')
@@ -457,6 +457,19 @@ def admin_delete_event(event_id):
         flash('Event deleted successfully', 'success')
     return redirect(url_for('admin_manage_events'))
 
+@app.route('/delete_event/<event_id>', methods=['POST', 'GET'])
+@login_required
+def delete_event(event_id):
+    if request.method == 'GET':
+        event = mongo.db.events.find_one({"_id": ObjectId(event_id)})
+        if not event:
+            flash('Event not found', 'danger')
+            return redirect(url_for('admin_manage_events'))
+
+        mongo.db.events.delete_one({"_id": ObjectId(event_id)})
+        flash('Event deleted successfully', 'success')
+    return redirect(url_for('list_events'))
+
 @app.route('/admin/delete_job/<job_id>', methods=['POST', 'GET'])
 @login_required
 def admin_delete_job(job_id):
@@ -464,14 +477,27 @@ def admin_delete_job(job_id):
         flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('dashboard'))
     if request.method == 'GET':
-        job = mongo.db.jobs.find_one({"_id": ObjectId(job_id)})
+        job = mongo.db.job_posts.find_one({"_id": ObjectId(job_id)})
         if not job:
             flash('Job not found', 'danger')
             return redirect(url_for('admin_manage_jobs'))
 
-        mongo.db.jobs.delete_one({"_id": ObjectId(job_id)})
+        mongo.db.job_posts.delete_one({"_id": ObjectId(job_id)})
         flash('Job deleted successfully', 'success')
     return redirect(url_for('admin_manage_jobs'))
+
+@app.route('/delete_job/<job_id>', methods=['POST', 'GET'])
+@login_required
+def delete_job(job_id):
+    if request.method == 'GET':
+        job = mongo.db.job_posts.find_one({"_id": ObjectId(job_id)})
+        if not job:
+            flash('Job not found', 'danger')
+            return redirect(url_for('list_jobs'))
+
+        mongo.db.job_posts.delete_one({"_id": ObjectId(job_id)})
+        flash('Job deleted successfully', 'success')
+    return redirect(url_for('list_jobs'))
 
 @app.route('/admin/edit_discussion/<discussion_id>', methods=['GET', 'POST'])
 @login_required
@@ -511,6 +537,32 @@ def admin_delete_discussion(discussion_id):
         flash('Discussion deleted successfully', 'success')
     return redirect(url_for('admin_manage_discussions'))
 
+@app.route('/delete_discussion/<discussion_id>', methods=['POST', 'GET'])
+@login_required
+def delete_discussion(discussion_id):
+    if request.method == 'GET':
+        discussion = mongo.db.discussions.find_one({"_id": ObjectId(discussion_id)})
+        if not discussion:
+            flash('Discussion not found', 'danger')
+            return redirect(url_for('list_discussions'))
+
+        mongo.db.discussions.delete_one({"_id": ObjectId(discussion_id)})
+        flash('Discussion deleted successfully', 'success')
+    return redirect(url_for('list_discussions'))
+
+@app.route('/delete_mentorship/<mentorship_id>', methods=['POST', 'GET'])
+@login_required
+def delete_mentorship(mentorship_id):
+    if request.method == 'GET':
+        mentorship = mongo.db.mentorship.find_one({"_id": ObjectId(mentorship_id)})
+        if not mentorship:
+            flash('Mentorship not found', 'danger')
+            return redirect(url_for('list_mentorships'))
+
+        mongo.db.mentorship.delete_one({"_id": ObjectId(mentorship_id)})
+        flash('Mentorship deleted successfully', 'success')
+    return redirect(url_for('list_mentorships'))
+
 
 
 
@@ -538,7 +590,7 @@ def create_profile():
             "contact_details": contact_details
         }
         mongo.db.alumni.insert_one(new_alumni)
-        mongo.db.users.update_one({"_id": ObjectId(current_user.id)}, {"$set": {"alumni_id": new_alumni["_id"]}})
+        mongo.db.users.update_one({"_id": ObjectId(current_user._id)}, {"$set": {"alumni_id": new_alumni["_id"]}})
         flash('Profile created successfully!', 'success')
         return redirect(url_for('view_profile'))
     return render_template('create_profile.html')
@@ -577,7 +629,17 @@ def admin_manage_notifications():
 def mark_as_read(notification_id):
     notification = mongo.db.notifications.find_one({"_id": ObjectId(notification_id)})
     if notification:
-        mongo.db.notifications.update_one({"_id": ObjectId(notification_id)}, {"$set": {"is_read": True}})
+        # mongo.db.notifications.update_one({"_id": ObjectId(notification_id)}, {"$set": {"is_read": True}})
+        # Check if the current user has already marked the notification as read
+        if current_user.username not in notification.get('read_by', []):
+            # Append the current user's username to the list of users who have read it
+            mongo.db.notifications.update_one(
+                {"_id": ObjectId(notification_id)},
+                {"$push": {"read_by": current_user.username}}
+            )
+            flash('Notification marked as read.', 'success')
+        else:
+            flash('You have already marked this notification as read.', 'info')
     else:
         flash('Notification not found or you do not have permission to mark it as read.', 'danger')
     return redirect(url_for('dashboard'))
@@ -586,6 +648,7 @@ def mark_as_read(notification_id):
 @login_required
 def admin_create_notification():
     if not current_user.is_admin:
+        flash('You do not have permission to access this page.', 'danger')
         return redirect(url_for('dashboard'))
 
     if request.method == 'POST':
@@ -599,7 +662,6 @@ def admin_create_notification():
         notification = {
                 "recipients": recipients,
                 'message': message,
-                'is_read': False,
                 'created_at': datetime.utcnow(),
                 'created_by': current_user.username
             }
@@ -634,7 +696,6 @@ def admin_edit_notification(notification_id):
         notification = {
                 "recipients": recipients,
                 'message': message,
-                'is_read': False,
                 'created_at': datetime.utcnow(),
                 'created_by': current_user.username
             }

@@ -176,13 +176,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // // Hide flash messages after 5 seconds
-    // const flashes = document.querySelectorAll(".flash");
-    // flashes.forEach(function (flash) {
-    //     setTimeout(function () {
-    //         flash.style.display = "none";
-    //     }, 5000); // 5000 milliseconds = 5 seconds
-    // });
 });
 
 document.addEventListener("DOMContentLoaded", function () {
