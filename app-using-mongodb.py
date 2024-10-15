@@ -102,7 +102,7 @@ def home():
     recent_discussions = mongo.db.discussions.find().sort("_id", -1).limit(5)
     job_posts = mongo.db.job_posts.find().sort("_id", -1).limit(5)
     mentorships = mongo.db.mentorships.find().sort("_id", -1).limit(5)
-    return render_template('home.html', upcoming_events=upcoming_events, recent_discussions=recent_discussions, notifications=notifications, job_posts=job_posts, mentorships=mentorships)
+    return render_template('home.html',datetime=datetime, upcoming_events=upcoming_events, recent_discussions=recent_discussions, notifications=notifications, job_posts=job_posts, mentorships=mentorships)
 
 @app.route('/dashboard')
 @login_required
@@ -398,7 +398,7 @@ def admin_edit_user(user_id):
 def admin_delete_user(user_id):
     if not current_user.is_admin():
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('login'))
     if request.method == 'GET':
         user = mongo.db.users.find_one({"_id": ObjectId(user_id)})
         if not user:
@@ -417,7 +417,7 @@ def admin_delete_user(user_id):
 def admin_delete_users():
     if not current_user.is_admin():
         flash('You do not have permission to perform this action.', 'danger')
-        return redirect(url_for('admin_manage_users'))
+        return redirect(url_for('login'))
     user_ids = request.form.getlist('user_ids')
     if user_ids:
         # Convert user_ids to ObjectId and remove the users from the database
@@ -446,7 +446,7 @@ def admin_delete_users():
 def admin_delete_event(event_id):
     if not current_user.is_admin():
         flash('You do not have permission to access this page.', 'danger')
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('login'))
     if request.method == 'GET':
         event = mongo.db.events.find_one({"_id": ObjectId(event_id)})
         if not event:
@@ -455,6 +455,29 @@ def admin_delete_event(event_id):
 
         mongo.db.events.delete_one({"_id": ObjectId(event_id)})
         flash('Event deleted successfully', 'success')
+    return redirect(url_for('admin_manage_events'))
+
+@app.route('/admin/delete_events', methods=['POST', 'GET'])
+@login_required
+def admin_delete_events():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('login'))
+    event_ids = request.form.getlist('event_ids')
+    if event_ids:
+        # mongo.db.users.delete_many({'_id': {'$in': [ObjectId(user_id)  for user_id in event_ids  ]}})
+        # flash(f'{len(event_ids)} user(s) deleted successfully.', 'success')
+
+        ids = []
+        for event_id in event_ids:
+            if ObjectId(event_id) != admin_id:
+                ids.append(ObjectId(event_id))
+        
+        mongo.db.events.delete_many({'_id': {'$in': ids}})
+        flash(f'{len(event_ids)} user(s) deleted successfully.', 'success')
+    else:
+        flash('No events selected for deletion.', 'warning')
+
     return redirect(url_for('admin_manage_events'))
 
 @app.route('/delete_event/<event_id>', methods=['POST', 'GET'])
@@ -484,6 +507,29 @@ def admin_delete_job(job_id):
 
         mongo.db.job_posts.delete_one({"_id": ObjectId(job_id)})
         flash('Job deleted successfully', 'success')
+    return redirect(url_for('admin_manage_jobs'))
+
+@app.route('/admin/delete_jobs', methods=['POST', 'GET'])
+@login_required
+def admin_delete_jobs():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('login'))
+    job_ids = request.form.getlist('job_ids')
+    if job_ids:
+        # mongo.db.users.delete_many({'_id': {'$in': [ObjectId(user_id)  for user_id in job_ids  ]}})
+        # flash(f'{len(job_ids)} user(s) deleted successfully.', 'success')
+
+        ids = []
+        for job_id in job_ids:
+            if ObjectId(job_id) != admin_id:
+                ids.append(ObjectId(job_id))
+        
+        mongo.db.job_posts.delete_many({'_id': {'$in': ids}})
+        flash(f'{len(job_ids)} user(s) deleted successfully.', 'success')
+    else:
+        flash('No jobs selected for deletion.', 'warning')
+
     return redirect(url_for('admin_manage_jobs'))
 
 @app.route('/delete_job/<job_id>', methods=['POST', 'GET'])
@@ -536,6 +582,31 @@ def admin_delete_discussion(discussion_id):
         mongo.db.discussions.delete_one({"_id": ObjectId(discussion_id)})
         flash('Discussion deleted successfully', 'success')
     return redirect(url_for('admin_manage_discussions'))
+
+
+@app.route('/admin/delete_discussions', methods=['POST', 'GET'])
+@login_required
+def admin_delete_discussions():
+    if not current_user.is_admin():
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('login'))
+    discussion_ids = request.form.getlist('discussion_ids')
+    if discussion_ids:
+        # mongo.db.users.delete_many({'_id': {'$in': [ObjectId(user_id)  for user_id in discussion_ids  ]}})
+        # flash(f'{len(discussion_ids)} user(s) deleted successfully.', 'success')
+
+        ids = []
+        for discussion_id in discussion_ids:
+            if ObjectId(discussion_id) != admin_id:
+                ids.append(ObjectId(discussion_id))
+        
+        mongo.db.discussions.delete_many({'_id': {'$in': ids}})
+        flash(f'{len(discussion_ids)} user(s) deleted successfully.', 'success')
+    else:
+        flash('No Discussion selected for deletion.', 'warning')
+
+    return redirect(url_for('admin_manage_discussions'))
+
 
 @app.route('/delete_discussion/<discussion_id>', methods=['POST', 'GET'])
 @login_required
